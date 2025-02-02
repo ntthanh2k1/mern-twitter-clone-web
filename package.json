@@ -1,0 +1,10 @@
+{
+  "name": "twitter-clone-web",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn --cwd ./backend-web && yarn --cwd ./frontend-web && yarn --cwd ./frontend-web build",
+    "start": "yarn --cwd ./backend-web prod"
+  }
+}
