@@ -42,7 +42,7 @@ export const signup = async (req, res) => {
       res.status(201).json({ 
         fullName: newUser.fullName,
         username: newUser.username,
-        email: newUser.email,
+        email: newUser.email
         // followers: newUser.followers,
         // following: newUser.following,
         // profileImg: newUser.profileImg,
@@ -60,14 +60,40 @@ export const signup = async (req, res) => {
   }
 };
 
+// Sign in
 export const signin = async (req, res) => {
-  res.json({
-    data: "This is sign in enpoint"
-  });
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    const pwd = await bcrypt.compare(password, user?.password || "");
+
+    if (!user) {
+      return res.status(400).json({ error: "Username is incorrect." });
+    }
+
+    if (!pwd) {
+      return res.status(400).json({ error: "Password is incorrect." });
+    }
+
+    generateTokenAndSetCookie(user._id, res);
+
+    res.status(200).json({
+      fullName: user.fullName,
+      username: user.username,
+      email: user.email
+    });
+  } catch (error) {
+    console.error(`Error sign in module: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error." });
+  }
 };
 
 export const signout = async (req, res) => {
-  res.json({
-    data: "This is sign out enpoint"
-  });
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "User signed out."});
+  } catch (error) {
+    console.error(`Error sign out module: ${error.message}`);
+    res.status(500).json({ error: "Internal Server Error." });
+  }
 };
