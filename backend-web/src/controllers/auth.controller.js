@@ -1,14 +1,16 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import { generateTokenAndSetCookie } from "./utils/generateToken.js";
 
+// sign up
 export const signup = async (req, res) => {
   try {
     const { fullName, username, email, password } = req.body;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const existingUser = await User.findOne({ username });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const existingEmail = await User.findOne({ email });
     // Hash password
-    const salt = await bcrypt.salt(10);
+    const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     if (existingUser) {
@@ -21,6 +23,10 @@ export const signup = async (req, res) => {
 
     if (existingEmail) {
       return res.status(400).json({ error: "Email is already taken." });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters." });
     }
 
     const newUser = new User({
