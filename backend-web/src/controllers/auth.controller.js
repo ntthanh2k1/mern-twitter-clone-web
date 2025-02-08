@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 
 // sign up
-export const signup = async (req, res) => {
+export const signUp = async (req, res) => {
   try {
     const { fullName, username, email, password } = req.body;
     const existingUser = await User.findOne({ username });
@@ -43,7 +43,7 @@ export const signup = async (req, res) => {
       generateTokenAndSetCookie(newUser._id, res);
       await newUser.save();
       res.status(201).json({ 
-        message: "User signed up.",
+        message: "Signed up successfully.",
         fullName: newUser.fullName,
         username: newUser.username,
         email: newUser.email
@@ -59,13 +59,13 @@ export const signup = async (req, res) => {
       res.status(400).json({ error: "Data is invalid." });
     }
   } catch (error) {
-    console.error(`Error sign up module: ${error.message}`);
-    res.status(500).json({ error: "Internal Server Error." });
+    console.error(`Error signUp module: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 };
 
 // Sign in
-export const signin = async (req, res) => {
+export const signIn = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username });
@@ -74,42 +74,44 @@ export const signin = async (req, res) => {
       return res.status(400).json({ error: "Username is incorrect." });
     }
 
-    const pwd = await bcrypt.compare(password, user?.password || "");
+    const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
 
-    if (!pwd) {
+    if (!isPasswordCorrect) {
       return res.status(400).json({ error: "Password is incorrect." });
     }
 
     generateTokenAndSetCookie(user._id, res);
 
     res.status(200).json({
-      message: "User signed in.",
+      message: "Signed in successfully.",
       fullName: user.fullName,
       username: user.username,
       email: user.email
     });
   } catch (error) {
-    console.error(`Error sign in module: ${error.message}`);
-    res.status(500).json({ error: "Internal Server Error." });
+    console.error(`Error signIn module: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 };
 
-export const signout = async (req, res) => {
+// Sign out
+export const signOut = async (req, res) => {
   try {
     res.cookie("jwt", "", { maxAge: 0 });
-    res.status(200).json({ message: "User signed out."});
+    res.status(200).json({ message: "Signed out successfully."});
   } catch (error) {
-    console.error(`Error sign out module: ${error.message}`);
-    res.status(500).json({ error: "Internal Server Error." });
+    console.error(`Error signOut module: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 };
 
+// Get user's information
 export const getInfo = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password");
     res.status(200).json(user);
   } catch (error) {
-    console.error(`Error get info module: ${error.message}`);
-    res.status(500).json({ error: "Internal Server Error." });
+    console.error(`Error getInfo module: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 };
