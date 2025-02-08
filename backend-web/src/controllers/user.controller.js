@@ -3,9 +3,8 @@ import Notification from "../models/notification.model.js";
 
 // Get user profile
 export const getUserProfile = async (req, res) => {
-  const { username } = req.params;
-  
   try {
+    const { username } = req.params;
     const user = await User.findOne({ username }).select("-password");
 
     if (!user) {
@@ -19,17 +18,47 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
+// Get suggested users
+export const getSuggestedUsers = async (req, res) => {
+  try {
+    const userId  = req.user._id;
+    const usersFollowedByMe = await User.findById(userId).select("following");
+    const users = await User.aggregate([
+      {
+        $match: {
+          _id: { $ne: userId }
+        }
+      },
+      {
+        $sample: { size: 10 }
+      },
+      {
+        $project: {
+          password: 0 // Exclude the password field
+        }
+      }
+    ]);
+    const filteredUsers = users.filter(user => !usersFollowedByMe.following.includes(user._id));
+    const suggestedUsers = filteredUsers.slice(0, 4);
+
+    // suggestedUsers.forEach(user => user.password = null);
+
+    res.status(200).json(suggestedUsers);
+  } catch (error) {
+    console.log(`Error in getSuggestedUsers module: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Follow or unfollow user
 export const followOrUnfollowUser = async (req, res) => {
-  const { id } = req.params;
-
   try {
+    const { id } = req.params;
     const userToModify = await User.findById(id);
     const currentUser = await User.findById(req.user._id);
 
     if (id === req.user._id.toString()) {
-      return res.status(400).json({ error: "You can't follow or unfollow yourself." });
+      return res.status(400).json({ error: "You can not follow or unfollow yourself." });
     }
 
     if (!userToModify || !currentUser) {
