@@ -4,8 +4,9 @@ import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 
 // sign up
 export const signUp = async (req, res) => {
+  const { fullName, username, email, password } = req.body;
+  
   try {
-    const { fullName, username, email, password } = req.body;
     const existingUser = await User.findOne({ username });
 
     if (existingUser) {
@@ -66,8 +67,9 @@ export const signUp = async (req, res) => {
 
 // Sign in
 export const signIn = async (req, res) => {
+  const { username, password } = req.body;
+  
   try {
-    const { username, password } = req.body;
     const user = await User.findOne({ username });
 
     if (!user) {
@@ -107,8 +109,11 @@ export const signOut = async (req, res) => {
 
 // Get user's information
 export const getInfo = async (req, res) => {
+  const userId = req.user._id;
+
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(userId).select("-password");
+    
     res.status(200).json(user);
   } catch (error) {
     console.error(`Error getInfo module: ${error.message}`);
