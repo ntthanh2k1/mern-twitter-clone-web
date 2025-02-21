@@ -94,7 +94,7 @@ export const followOrUnfollowUser = async (req, res) => {
       res.status(200).json({ message: "Followed user successfully." });
     }
   } catch (error) {
-    console.log(`Error getUserProfile module: ${error.message}`);
+    console.log(`Error followOrUnfollowUser module: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };

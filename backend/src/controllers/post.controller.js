@@ -1,3 +1,4 @@
+import { v2 as cloudinary } from "cloudinary";
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 
@@ -14,7 +15,7 @@ export const createPost = async (req, res) => {
     }
 
     if (!text) {
-      return res.status(400).json({ erroe: "Please enter text." });
+      return res.status(400).json({ erroe: "Please enter the text." });
     }
 
     if (img) {
@@ -30,8 +31,18 @@ export const createPost = async (req, res) => {
     });
 
     await newPost.save(newPost);
+    res.status(201).json(newPost);
   } catch (error) {
-    console.log(`Error getUserProfile module: ${error.message}`);
+    console.log(`Error createPost module: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.log(`Error deletePost module: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
