@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "yarn --cwd ./backend && yarn --cwd ./frontend && yarn --cwd ./frontend build",
-    "start": "yarn --cwd ./backend prod"
+    "build": "yarn --cwd ./api && yarn --cwd ./client && yarn --cwd ./client build",
+    "start": "yarn --cwd ./api prod"
   }
 }
