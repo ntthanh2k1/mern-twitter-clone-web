@@ -6,7 +6,7 @@ import Notification from "../models/notification.model.js";
 // Get user profile
 export const getUserProfile = async (req, res) => {
   const { username } = req.params;
-  
+
   try {
     const user = await User.findOne({ username }).select("-password");
 
@@ -23,8 +23,8 @@ export const getUserProfile = async (req, res) => {
 
 // Get suggested users
 export const getSuggestedUsers = async (req, res) => {
-  const userId  = req.user._id;
-  
+  const userId = req.user._id;
+
   try {
     const usersFollowedByMe = await User.findById(userId).select("following");
     const users = await User.aggregate([
@@ -57,7 +57,7 @@ export const getSuggestedUsers = async (req, res) => {
 // Follow or unfollow user
 export const followOrUnfollowUser = async (req, res) => {
   const { id } = req.params;
-  
+
   try {
     const userToModify = await User.findById(id);
     const currentUser = await User.findById(req.user._id);
@@ -103,7 +103,7 @@ export const updateUser = async (req, res) => {
   const { fullName, username, email, currentPassword, newPassword, bio, link } = req.body;
   let { profileImg, coverImg } = req.body;
   const userId = req.user._id;
-  
+
   try {
     // find user in db
     let user = await User.findById(userId);
@@ -114,7 +114,7 @@ export const updateUser = async (req, res) => {
 
     // check username exists
     const existingUser = await User.findOne({ username });
-    
+
     if (existingUser) {
       return res.status(400).json({ error: "Username is already taken." });
     }
@@ -123,7 +123,7 @@ export const updateUser = async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (email && !emailRegex.test(email)) {
-      return res.status(400).json({ error: "Email's format is invalid."});
+      return res.status(400).json({ error: "Email's format is invalid." });
     }
 
     // check email exists
@@ -137,7 +137,7 @@ export const updateUser = async (req, res) => {
     if ((!currentPassword && newPassword) || (currentPassword && !newPassword)) {
       return res.status(400).json({ error: "Please enter both current password and new password." });
     }
-    
+
     if (currentPassword && newPassword) {
       const isMatch = await bcrypt.compare(currentPassword, user.password);
 
@@ -161,7 +161,6 @@ export const updateUser = async (req, res) => {
       }
 
       const uploadedResponse = await cloudinary.uploader.upload(profileImg);
-
       profileImg = uploadedResponse.secure_url;
     }
 
@@ -172,7 +171,6 @@ export const updateUser = async (req, res) => {
       }
 
       const uploadedResponse = await cloudinary.uploader.upload(coverImg);
-      
       coverImg = uploadedResponse.secure_url;
     }
 
@@ -180,13 +178,12 @@ export const updateUser = async (req, res) => {
     user.fullName = fullName || user.fullName;
     user.username = username || user.username;
     user.email = email || user.email;
-		user.profileImg = profileImg || user.profileImg;
-		user.coverImg = coverImg || user.coverImg;
+    user.profileImg = profileImg || user.profileImg;
+    user.coverImg = coverImg || user.coverImg;
     user.bio = bio || user.bio;
-		user.link = link || user.link;
+    user.link = link || user.link;
 
     user = await user.save();
-
     res.status(200).json(user);
   } catch (error) {
     console.log(`Error updateUser module: ${error.message}`);
