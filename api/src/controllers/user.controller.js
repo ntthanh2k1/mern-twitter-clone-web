@@ -10,6 +10,7 @@ export const getUserProfile = async (req, res) => {
   try {
     const user = await User.findOne({ username }).select("-password");
 
+    // Check user exists
     if (!user) {
       return res.status(404).json({ error: "User is not found." });
     }
@@ -30,11 +31,11 @@ export const getSuggestedUsers = async (req, res) => {
     const users = await User.aggregate([
       {
         $match: {
-          _id: { $ne: userId }
+          _id: { $ne: userId } // Match ids except myself
         }
       },
       {
-        $sample: { size: 10 }
+        $sample: { size: 10 } // Get 10 records
       },
       {
         $project: {
@@ -45,6 +46,7 @@ export const getSuggestedUsers = async (req, res) => {
     const filteredUsers = users.filter(user => !usersFollowedByMe.following.includes(user._id));
     const suggestedUsers = filteredUsers.slice(0, 4);
 
+    // This code below also exclude password
     // suggestedUsers.forEach(user => user.password = null);
 
     res.status(200).json(suggestedUsers);
@@ -62,10 +64,12 @@ export const followOrUnfollowUser = async (req, res) => {
     const userToModify = await User.findById(id);
     const currentUser = await User.findById(req.user._id);
 
+    // Check that can not follow or unfollow myself
     if (id === req.user._id.toString()) {
       return res.status(400).json({ error: "You can not follow or unfollow yourself." });
     }
 
+    // Check user exists
     if (!userToModify || !currentUser) {
       return res.status(404).json({ error: "User is not found." });
     }
@@ -99,6 +103,7 @@ export const followOrUnfollowUser = async (req, res) => {
   }
 };
 
+// Update user
 export const updateUser = async (req, res) => {
   const { fullName, username, email, currentPassword, newPassword, bio, link } = req.body;
   let { profileImg, coverImg } = req.body;
@@ -133,7 +138,7 @@ export const updateUser = async (req, res) => {
       return res.status(400).json({ error: "Email is already taken." });
     }
 
-    // check current password and new password
+    // Check current password and new password
     if ((!currentPassword && newPassword) || (currentPassword && !newPassword)) {
       return res.status(400).json({ error: "Please enter both current password and new password." });
     }

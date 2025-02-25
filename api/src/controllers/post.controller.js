@@ -39,6 +39,41 @@ export const createPost = async (req, res) => {
   }
 };
 
+// Like or unlike post
+export const likeOrUnlikePost = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const postId = req.params.id;
+
+    const post = await Post.findById(postId);
+
+    // Check post exists
+    if (!post) {
+      return res.status(404).json({ error: "Post is not found." });
+    }
+
+    const isLike = post.likes.includes(userId);
+
+    // Check if liked -> unlike
+    // else like
+    if (isLike) {
+      post.likes.pull(userId);
+      await post.save();
+      // await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } });
+      res.status(200).json(post);
+    }
+    else {
+      post.likes.push(userId);
+      await post.save();
+      // await Post.findByIdAndUpdate(postId, { $push: { likes: userId } });
+      res.status(200).json(post);
+    }
+  } catch (error) {
+    console.log(`Error likeOrUnlikePost module: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Comment on post
 export const commentOnPost = async (req, res) => {
   try {
@@ -46,12 +81,14 @@ export const commentOnPost = async (req, res) => {
     const userId = req.user._id;
     const postId = req.params.id;
 
+    // Check text is not null before
     if (!text) {
       return res.status(400).json({ error: "Text is required." });
     }
 
     const post = await Post.findById(postId);
 
+    // Check post exists
     if (!post) {
       return res.status(404).json({ error: "Post is not found." });
     }
@@ -75,14 +112,17 @@ export const deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
+    // Check post exists
     if (!post) {
       return res.status(404).json({ error: "Post is not found." });
     }
 
+    // Check if user does not own post, it can not be deleted.
     if (post.user.toString() !== req.user._id.toString()) {
       return res.status(401).json({ error: "You are not authorized to delete this post." });
     }
 
+    // Check image exists
     if (post.img) {
       const imgId = post.img.split("/").pop().split(".")[0]
       await cloudinary.uploader.destroy(imgId);
