@@ -1,6 +1,17 @@
 import { v2 as cloudinary } from "cloudinary";
 import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
+import Notification from "../models/notification.model.js";
+
+// Get all posts
+export const getAllPosts = async (req, res) => {
+  try {
+
+  } catch (error) {
+    console.log(`Error createPost module: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Create post
 export const createPost = async (req, res) => {
@@ -11,14 +22,17 @@ export const createPost = async (req, res) => {
   try {
     const user = await User.findById(userId);
 
+    // Check user exists
     if (!user) {
       return res.status(404).json({ error: "User is not found." });
     }
 
+    // Check text is required
     if (!text) {
       return res.status(400).json({ erroe: "Please enter the text." });
     }
 
+    // Check image is posted
     if (img) {
       const uploadedRespoonse = await cloudinary.uploader.upload(img);
 
@@ -44,6 +58,7 @@ export const likeOrUnlikePost = async (req, res) => {
   try {
     const userId = req.user._id;
     const postId = req.params.id;
+    // const { id: postId } = req.params;
 
     const post = await Post.findById(postId);
 
@@ -52,21 +67,31 @@ export const likeOrUnlikePost = async (req, res) => {
       return res.status(404).json({ error: "Post is not found." });
     }
 
-    const isLike = post.likes.includes(userId);
+    const userLikedPost = post.likes.includes(userId);
 
     // Check if liked -> unlike
     // else like
-    if (isLike) {
+    if (userLikedPost) {
       post.likes.pull(userId);
       await post.save();
       // await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } });
-      res.status(200).json(post);
+      // await Post.findOne({ _id: postId }, { $pull: { likes: userId } });
+      res.status(200).json({ message: "Unliked post successfully." });
     }
     else {
       post.likes.push(userId);
       await post.save();
       // await Post.findByIdAndUpdate(postId, { $push: { likes: userId } });
-      res.status(200).json(post);
+      // await Post.findOne({ _id: postId }, { $push: { likes: userId } });
+
+      const newNotification = new Notification({
+        from: userId,
+        to: post.user,
+        type: "like"
+      });
+
+      await newNotification.save();
+      res.status(200).json({ message: "Liked post successfully." });
     }
   } catch (error) {
     console.log(`Error likeOrUnlikePost module: ${error.message}`);
