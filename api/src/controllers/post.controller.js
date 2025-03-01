@@ -6,9 +6,24 @@ import Notification from "../models/notification.model.js";
 // Get all posts
 export const getAllPosts = async (req, res) => {
   try {
-
+    const userId = req.user._id;
+    // const posts = await Post.find({ user: userId })
+    //   .populate("user", "fullName username profileImg")
+    //   .populate("comments.user", "fullName username profileImg")
+    //   .sort({ createdAt: -1 });
+    const posts = await Post.find({ user: userId })
+      .populate({
+        path: "user",
+        select: "-password"
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password"
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json(posts);
   } catch (error) {
-    console.log(`Error createPost module: ${error.message}`);
+    console.log(`Error getAllPosts module: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
@@ -74,15 +89,17 @@ export const likeOrUnlikePost = async (req, res) => {
     if (userLikedPost) {
       post.likes.pull(userId);
       await post.save();
+      await User.findByIdAndUpdate(userId, { $pull: { likedPost: postId } });
       // await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } });
-      // await Post.findOne({ _id: postId }, { $pull: { likes: userId } });
+      // await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
       res.status(200).json({ message: "Unliked post successfully." });
     }
     else {
       post.likes.push(userId);
       await post.save();
+      await User.findByIdAndUpdate(userId, { $push: { likedPost: postId } });
       // await Post.findByIdAndUpdate(postId, { $push: { likes: userId } });
-      // await Post.findOne({ _id: postId }, { $push: { likes: userId } });
+      // await Post.updateOne({ _id: postId }, { $push: { likes: userId } });
 
       const newNotification = new Notification({
         from: userId,
