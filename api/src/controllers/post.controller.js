@@ -30,7 +30,25 @@ export const getAllPosts = async (req, res) => {
 // Get liked posts
 export const getLikedPosts = async (req, res) => {
   try {
-    
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User is not found." });
+    }
+
+    const likedPosts = await Post.find({ _id: { $in: user.likedPost } })
+      .populate({
+        path: "user",
+        select: "-password"
+      })
+      .populate({
+        path: "comments.user",
+        select: "-password"
+      });
+
+    res.status(200).json(likedPosts);
   } catch (error) {
     console.log(`Error getLikedPosts module: ${error.message}`);
     res.status(500).json({ error: error.message });
