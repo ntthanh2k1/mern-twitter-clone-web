@@ -6,12 +6,11 @@ import Notification from "../models/notification.model.js";
 // Get all posts
 export const getAllPosts = async (req, res) => {
   try {
-    const userId = req.user._id;
-    // const posts = await Post.find({ user: userId })
+    // const posts = await Post.find()
     //   .populate("user", "fullName username profileImg")
     //   .populate("comments.user", "fullName username profileImg")
     //   .sort({ createdAt: -1 });
-    const posts = await Post.find({ user: userId })
+    const posts = await Post.find()
       .populate({
         path: "user",
         select: "-password"
@@ -24,6 +23,16 @@ export const getAllPosts = async (req, res) => {
     res.status(200).json(posts);
   } catch (error) {
     console.log(`Error getAllPosts module: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Get liked posts
+export const getLikedPosts = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    console.log(`Error getLikedPosts module: ${error.message}`);
     res.status(500).json({ error: error.message });
   }
 };
