@@ -1,9 +1,7 @@
-import { Link } from "react-router-dom";
 import XSvg from "../../../components/svgs/X";
-import { MdOutlineMail } from "react-icons/md";
+import { MdDriveFileRenameOutline, MdOutlineMail, MdPassword } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
-import { MdPassword } from "react-icons/md";
-import { MdDriveFileRenameOutline } from "react-icons/md";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 const SignUpPage = () => {
@@ -15,13 +13,15 @@ const SignUpPage = () => {
   });
 
   const submitHandler = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Page will not reload
     console.log(formData);
   };
 
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   };
+
+  const isError = false;
   
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen px-10">
@@ -39,19 +39,17 @@ const SignUpPage = () => {
               name="fullName" value={formData.fullName} onChange={changeHandler} />
           </label>
 
-          <div className="flex flex-wrap gap-4">
-            <label className="input input-bordered rounded-lg flex-1 flex items-center gap-2">
-              <MdOutlineMail />
-              <input type="email" className="grow" placeholder="Email"
-                name="email" value={formData.email} onChange={changeHandler} />
-            </label>
-            
-            <label className="input input-bordered rounded-lg flex-1 flex items-center gap-2">
-              <FaUser />
-              <input type="text" className="grow" placeholder="Username"
-                name="username" value={formData.username} onChange={changeHandler} />
-            </label>            
-          </div>
+          <label className="input input-bordered rounded-lg flex items-center gap-2">
+            <MdOutlineMail />
+            <input type="email" className="grow" placeholder="Email"
+              name="email" value={formData.email} onChange={changeHandler} />
+          </label>
+          
+          <label className="input input-bordered rounded-lg flex items-center gap-2">
+            <FaUser />
+            <input type="text" className="grow" placeholder="Username"
+              name="username" value={formData.username} onChange={changeHandler} />
+          </label>
 
           <label className="input input-bordered rounded-lg flex items-center gap-2">
             <MdPassword />
@@ -59,6 +57,7 @@ const SignUpPage = () => {
               name="password" value={formData.password} onChange={changeHandler} />
           </label>
 
+          {isError && <p className="text-red-500">Something went wrong!</p>}
           <button className="btn btn-primary rounded-lg text-white">Sign up</button>
         </form>
 
