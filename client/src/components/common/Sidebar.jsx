@@ -13,7 +13,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="md:flex-[2_2_0] w-18 max-w-52 border-l border-gray-700">
+    <div className="md:flex-[2_2_0] max-w-52 border-l border-gray-700">
       <div className="sticky top-0 left-0 h-screen flex flex-col w-20 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start px-4 py-2">
           <XSvg className="w-10 h-10 rounded-full fill-white hover:bg-stone-900" />
