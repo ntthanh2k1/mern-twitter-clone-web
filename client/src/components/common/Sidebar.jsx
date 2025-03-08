@@ -16,26 +16,26 @@ const Sidebar = () => {
     <div className="md:flex-[2_2_0] max-w-52 border-l border-gray-700">
       <div className="sticky top-0 left-0 h-screen flex flex-col w-20 md:w-full">
         <Link to="/" className="flex justify-center md:justify-start px-4 py-2">
-          <XSvg className="w-10 h-10 rounded-full fill-white hover:bg-stone-900" />
+          <XSvg className="w-10 h-10 fill-white hover:bg-gray-900" />
         </Link>
 
         <ul className="flex flex-col gap-3 mt-4">
           <li className="flex justify-center md:justify-start">
-            <Link to="/" className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-700 transition-all duration-300 rounded-full cursor-pointer">
+            <Link to="/" className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
               <MdHomeFilled className="w-6 h-6" />
               <span className="text-lg hidden md:block">Home</span>
             </Link>
           </li>
             
           <li className="flex justify-center md:justify-start">
-            <Link to="/notifications" className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-700 transition-all duration-300 rounded-full cursor-pointer">
+            <Link to="/notifications" className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
               <IoNotifications className="w-6 h-6" />
               <span className="text-lg hidden md:block">Notifications</span>
             </Link>
           </li>
 
           <li className="flex justify-center md:justify-start">
-            <Link to={`/profile/${data.username}`} className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-700 transition-all duration-300 rounded-full cursor-pointer">
+            <Link to={`/profile/${data.username}`} className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
               <FaUser className="w-6 h-6" />
               <span className="text-lg hidden md:block">Profile</span>
             </Link>
@@ -43,7 +43,7 @@ const Sidebar = () => {
         </ul>
         {data && (
           <Link to={`/profile/${data.username}`}
-            className="flex mx-auto items-center mt-auto mb-10 px-4 py-2 gap-3 md:w-full hover:bg-gray-700 transition-all duration-300 rounded-full cursor-pointer">
+            className="flex mx-auto items-center mt-auto mb-10 px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
             <div className="avatar hidden md:inline-flex">
               <div className="w-10">
                 <img className="rounded-full" src={data?.profileImg || "/avatar-placeholder.png"}  alt="profileImg"/>

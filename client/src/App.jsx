@@ -10,11 +10,13 @@ function App() {
     <>
       <div className="flex max-w-6xl mx-auto">
         <Sidebar />
+
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/signIn" element={<SignInPage />} />
           <Route path="/signUp" element={<SignUpPage />} />
         </Routes>
+
         <RightPanel />
       </div>
     </>
