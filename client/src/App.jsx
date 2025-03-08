@@ -3,6 +3,7 @@ import SignUpPage from "./pages/auth/signup/SignUpPage";
 import SignInPage from "./pages/auth/signin/SignInPage";
 import HomePage from "./pages/home/HomePage";
 import Sidebar from "./components/common/Sidebar";
+import RightPanel from "./components/common/RightPanel.jsx";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/signIn" element={<SignInPage />} />
           <Route path="/signUp" element={<SignUpPage />} />
         </Routes>
+        <RightPanel />
       </div>
     </>
   );
