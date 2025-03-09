@@ -8,14 +8,14 @@ const Posts = () => {
 	return (
 		<>
 			{isLoading && (
-				<div className='flex flex-col justify-center'>
+				<div className="flex flex-col justify-center">
 					<PostSkeleton />
 					<PostSkeleton />
 					<PostSkeleton />
 				</div>
 			)}
 			
-      {!isLoading && POSTS?.length === 0 && <p className='text-center my-4'>No posts in this tab. Switch 👻</p>}
+      {!isLoading && POSTS?.length === 0 && <p className="text-center my-4">No posts in this tab. Switch 👻</p>}
 			
       {!isLoading && POSTS && (
 				<div>
