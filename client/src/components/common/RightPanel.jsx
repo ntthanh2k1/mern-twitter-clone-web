@@ -1,6 +1,6 @@
-import RightPanelSkeleton from "../skeletons/RightPanelSkeleton.jsx";
-import {USERS_FOR_RIGHT_PANEL} from "../../utils/db/dummy.js";
 import {Link} from "react-router-dom";
+import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
+import { USERS_FOR_RIGHT_PANEL } from "../../utils/db/dummy";
 
 const RightPanel = () => {
   const isLoading = false;
@@ -20,6 +20,7 @@ const RightPanel = () => {
               <RightPanelSkeleton />
             </>
           )}
+          
           {!isLoading && (
             USERS_FOR_RIGHT_PANEL?.map((user) => (
               <Link to={`/profile/${user.username}`}

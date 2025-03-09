@@ -7,6 +7,7 @@ const RightPanelSkeleton = () => {
         <div className="flex flex-1 justify-between">
           <div className="flex flex-col gap-1">
             <div className="skeleton w-12 h-2 rouded-full"></div>
+            
             <div className="skeleton w-6 h-2 rounded-full"></div>
           </div>
 

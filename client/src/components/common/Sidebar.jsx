@@ -41,6 +41,7 @@ const Sidebar = () => {
             </Link>
           </li>
         </ul>
+
         {data && (
           <Link to={`/profile/${data.username}`}
             className="flex mx-auto items-center mt-auto mb-10 px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
@@ -53,6 +54,7 @@ const Sidebar = () => {
             <div className="flex justify-between items-center flex-1 gap-3">
               <div className="hidden md:block">
                 <p className="text-white font-bold text-sm w-20 truncate">{data?.fullName}</p>
+                
                 <p className="text-slate-500 text-sm">{data?.username}</p>
               </div>
               <BiLogOut className="w-6 h-6 cursor-pointer" />
