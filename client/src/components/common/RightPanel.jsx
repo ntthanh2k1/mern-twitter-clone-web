@@ -6,11 +6,11 @@ const RightPanel = () => {
   const isLoading = false;
 
   return (
-    <div>
-      <div>
-        <p>Who to follow</p>
+    <div className="hidden lg:block mx-2 my-4">
+      <div className="sticky p-4 top-2 rounded-md">
+        <p className="font-bold">Who to follow</p>
 
-        <div>
+        <div className="flex flex-col gap-4">
           {/*item */}
           {isLoading && (
             <>
@@ -23,26 +23,25 @@ const RightPanel = () => {
           {!isLoading && (
             USERS_FOR_RIGHT_PANEL?.map((user) => (
               <Link to={`/profile/${user.username}`}
-                className=""
+                className="flex justify-between items-center gap-4"
                 key={user._id}>
-                <div>
-                  <div>
-                    <div>
+                <div className="flex items-center gap-2">
+                  <div className="avatar">
+                    <div className="w-8 rounded-full">
                       <img src={user.profileImg || "/avatar-placeholder.png"} alt="profileImg" />
                     </div>
                   </div>
 
-                  <div>
-                    <span>
-                      {user.fullName}
-                    </span>
+                  <div className="flex flex-col">
+                    <span className="font-semibold tracking-tight truncate w-28">{user.fullName}</span>
 
-                    <span>{user.username}</span>
+                    <span className="text-sm text-slate-500">{user.username}</span>
                   </div>
                 </div>
 
                 <div>
-                  <button>
+                  <button className="btn btn-sm bg-white text-black hover:bg-white hover:opacity-90 rounded-full"
+                    onClick={(e) => e.preventDefault()}>
                     Follow
                   </button>
                 </div>
