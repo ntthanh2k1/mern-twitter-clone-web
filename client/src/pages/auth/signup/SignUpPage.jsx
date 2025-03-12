@@ -3,6 +3,8 @@ import { MdDriveFileRenameOutline, MdOutlineMail, MdPassword } from "react-icons
 import { FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -12,16 +14,36 @@ const SignUpPage = () => {
     password: ""
   });
 
+  const { mutate, isError, isPending, error } = useMutation({
+    mutationFn: async ({ fullName, email, username, password }) => {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ fullName, email, username, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Account registration failed.");
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Account registration successful.");
+    }
+  });
+
   const submitHandler = (e) => {
     e.preventDefault(); // Page will not reload
-    console.log(formData);
+    mutate(formData);
   };
 
   const changeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   };
-
-  const isError = false;
   
   return (
     <div className="max-w-screen-xl mx-auto flex h-screen px-10">
@@ -57,8 +79,11 @@ const SignUpPage = () => {
               name="password" value={formData.password} onChange={changeHandler} />
           </label>
 
-          {isError && <p className="text-red-500">Something went wrong!</p>}
-          <button className="btn btn-primary rounded-lg text-white">Sign up</button>
+          {isError && <p className="text-red-500">{error.message}</p>}
+
+          <button className="btn btn-primary rounded-lg text-white">
+            {isPending ? "Loading...": "Sign up"}
+          </button>
         </form>
 
         <div className="flex flex-col lg:w-2/3 gap-2 mt-4">

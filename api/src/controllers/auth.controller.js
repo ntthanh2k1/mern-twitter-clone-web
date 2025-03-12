@@ -7,6 +7,22 @@ export const signUp = async (req, res) => {
   const { fullName, username, email, password } = req.body;
 
   try {
+    if (!fullName) {
+      return res.status(400).json({ error: "Full name is required." });
+    }
+    
+    if (!email) {
+      return res.status(400).json({ error: "Email is required." });
+    }
+
+    if (!username) {
+      return res.status(400).json({ error: "Username is required." });
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: "Password is required." });
+    }
+
     const existingUser = await User.findOne({ username });
 
     // Check if username exists, can not register
