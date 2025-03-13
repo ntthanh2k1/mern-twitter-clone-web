@@ -4,6 +4,8 @@ import { BiLogOut } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import XSvg from "../svgs/X";
 import { FaUser } from "react-icons/fa";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 const Sidebar = () => {
   const data = {
@@ -11,6 +13,22 @@ const Sidebar = () => {
     username: "ntthanh2k1",
     profileImg: "/avatars/boy1.png"
   };
+
+  const { mutate:signOutMutation } = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/auth/signout", {
+        method: "POST"
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Sign out failed.");
+      }
+    },
+    onSuccess: () => {
+      toast.success("Signed out successfully.");
+    }
+  });
 
   return (
     <div className="md:flex-[2_2_0] max-w-52 border-l border-gray-700">
@@ -57,7 +75,12 @@ const Sidebar = () => {
                 
                 <p className="text-slate-500 text-sm">{data?.username}</p>
               </div>
-              <BiLogOut className="w-6 h-6 cursor-pointer" />
+              <BiLogOut className="w-6 h-6 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  signOutMutation();
+                }}
+                />
             </div>
           </Link>
         )}

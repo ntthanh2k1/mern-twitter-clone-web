@@ -26,13 +26,13 @@ const SignUpPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Account registration failed.");
+        throw new Error(data.error || "Sign up failed.");
       }
 
       return data;
     },
     onSuccess: () => {
-      toast.success("Account registration successful.");
+      toast.success("Signed up successfully.");
     }
   });
 

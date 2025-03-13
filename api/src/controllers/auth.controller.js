@@ -90,6 +90,14 @@ export const signIn = async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    if (!username) {
+      return res.status(400).json({ error: "Username is required." });
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: "Password is required." });
+    }
+
     const user = await User.findOne({ username });
 
     // Check correct username
