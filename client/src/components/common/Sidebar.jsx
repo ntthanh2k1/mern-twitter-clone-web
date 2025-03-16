@@ -4,16 +4,10 @@ import { BiLogOut } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import XSvg from "../svgs/X";
 import { FaUser } from "react-icons/fa";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const Sidebar = () => {
-  const data = {
-    fullName: "Tri Thanh Nguyen",
-    username: "ntthanh2k1",
-    profileImg: "/avatars/boy1.png"
-  };
-
   const queryClient = useQueryClient();
 
   const { mutate:signOutMutation } = useMutation({
@@ -36,6 +30,8 @@ const Sidebar = () => {
       toast.error("Sign out failed.");
     }
   });
+
+  const { data:authUser } = useQuery({ queryKey: ["authUser"] });
 
   return (
     <div className="md:flex-[2_2_0] max-w-52 border-l border-gray-700">
@@ -60,27 +56,27 @@ const Sidebar = () => {
           </li>
 
           <li className="flex justify-center md:justify-start">
-            <Link to={`/profile/${data.username}`} className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
+            <Link to={`/profile/${authUser.username}`} className="flex items-center px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
               <FaUser className="w-6 h-6" />
               <span className="text-lg hidden md:block">Profile</span>
             </Link>
           </li>
         </ul>
 
-        {data && (
-          <Link to={`/profile/${data.username}`}
+        {authUser && (
+          <Link to={`/profile/${authUser.username}`}
             className="flex mx-auto items-center mt-auto mb-10 px-4 py-2 gap-3 md:w-full hover:bg-gray-800 transition-all duration-300 rounded-full cursor-pointer">
             <div className="avatar hidden md:inline-flex">
               <div className="w-10">
-                <img className="rounded-full" src={data?.profileImg || "/avatar-placeholder.png"}  alt="profileImg"/>
+                <img className="rounded-full" src={authUser?.profileImg || "/avatar-placeholder.png"}  alt="profileImg"/>
               </div>
             </div>
 
             <div className="flex justify-between items-center flex-1 gap-3">
               <div className="hidden md:block">
-                <p className="text-white font-bold text-sm w-20 truncate">{data?.fullName}</p>
+                <p className="text-white font-bold text-sm w-20 truncate">{authUser?.fullName}</p>
                 
-                <p className="text-slate-500 text-sm">{data?.username}</p>
+                <p className="text-slate-500 text-sm">{authUser?.username}</p>
               </div>
               <BiLogOut className="w-6 h-6 cursor-pointer"
                 onClick={(e) => {

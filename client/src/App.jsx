@@ -42,7 +42,7 @@ function App() {
   return (
     <>
       <div className="flex max-w-6xl mx-auto">
-        <Sidebar />
+        {authUser && <Sidebar />}
 
         <Routes>
           <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/signIn" />} />
@@ -52,7 +52,7 @@ function App() {
           <Route path="/profile/:username" element={authUser ? <ProfilePage /> : <Navigate to="/signIn" />} />
         </Routes>
 
-        <RightPanel />
+        {authUser && <RightPanel />}
 
         <Toaster />
       </div>
