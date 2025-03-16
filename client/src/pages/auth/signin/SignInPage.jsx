@@ -3,7 +3,7 @@ import { FaUser } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const SignInPage = () => {
@@ -11,6 +11,8 @@ const SignInPage = () => {
     username: "",
     password: ""
   });
+
+  const queryClient = useQueryClient();
 
   const { mutate:signInMutation, isError, isPending, error } = useMutation({
     mutationFn: async ({ username, password }) => {
@@ -28,6 +30,8 @@ const SignInPage = () => {
       }
     },
     onSuccess: () => {
+      // refresh the authUser
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success("Signed in successfully.");
     }
   });

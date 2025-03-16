@@ -4,7 +4,7 @@ import { BiLogOut } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import XSvg from "../svgs/X";
 import { FaUser } from "react-icons/fa";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const Sidebar = () => {
@@ -13,6 +13,8 @@ const Sidebar = () => {
     username: "ntthanh2k1",
     profileImg: "/avatars/boy1.png"
   };
+
+  const queryClient = useQueryClient();
 
   const { mutate:signOutMutation } = useMutation({
     mutationFn: async () => {
@@ -26,7 +28,12 @@ const Sidebar = () => {
       }
     },
     onSuccess: () => {
+      // refresh the authUser
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success("Signed out successfully.");
+    },
+    onError: () => {
+      toast.error("Sign out failed.");
     }
   });
 
