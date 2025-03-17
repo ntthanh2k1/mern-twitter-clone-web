@@ -6,9 +6,9 @@ const router = express.Router();
 
 router.get("/getAll", protectRoute, getAllPosts);
 
-router.get("/getUserPosts/:username", protectRoute, getUserPosts);
+router.get("/getByUser/:username", protectRoute, getUserPosts);
 
-router.get("/getFollowingPosts", protectRoute, getFollowingPosts);
+router.get("/getByFollowing", protectRoute, getFollowingPosts);
 
 router.get("/getLikedPosts/:id", protectRoute, getLikedPosts);
 

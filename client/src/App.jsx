@@ -23,7 +23,7 @@ function App() {
       }
 
       if (!res.ok) {
-        throw new Error(data.error || "Error getting user's info.");
+        throw new Error(data.error || "Error fetching user's info.");
       }
 
       return data;
