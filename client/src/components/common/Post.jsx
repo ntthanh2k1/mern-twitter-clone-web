@@ -27,7 +27,7 @@ const Post = ({ post }) => {
 			return data;
 		},
 		onSuccess: () => {
-			toast.success("Post was deleted successfully.");
+			toast.success("Post deleted successfully.");
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		}
 	});

@@ -112,11 +112,11 @@ export const getLikedPosts = async (req, res) => {
 
 // Create post
 export const createPost = async (req, res) => {
-  const { text } = req.body;
-  let { img } = req.body;
-  const userId = req.user._id.toString();
-
+  
   try {
+    const { text } = req.body;
+    let { img } = req.body;
+    const userId = req.user._id.toString();
     const user = await User.findById(userId);
 
     // Check user exists
@@ -126,23 +126,22 @@ export const createPost = async (req, res) => {
 
     // Check text is required
     if (!text) {
-      return res.status(400).json({ erroe: "Please enter the text." });
+      return res.status(400).json({ erroe: "Text is required." });
     }
 
     // Check image is posted
     if (img) {
       const uploadedRespoonse = await cloudinary.uploader.upload(img);
-
-      img = uploadedRespoonse.recure_url;
+      img = uploadedRespoonse.secure_url;
     }
 
     const newPost = new Post({
       user: userId,
       text,
-      img
+      img: img
     });
 
-    await newPost.save(newPost);
+    await newPost.save();
     res.status(201).json(newPost);
   } catch (error) {
     console.log(`Error createPost module: ${error.message}`);
