@@ -8,6 +8,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const Sidebar = () => {
+  const { data:authUser } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();
 
   const { mutate:signOutMutation } = useMutation({
@@ -30,8 +31,6 @@ const Sidebar = () => {
       toast.error("Sign out failed.");
     }
   });
-
-  const { data:authUser } = useQuery({ queryKey: ["authUser"] });
 
   return (
     <div className="md:flex-[2_2_0] max-w-52 border-l border-gray-700">
