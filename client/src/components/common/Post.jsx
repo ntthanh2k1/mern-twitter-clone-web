@@ -5,25 +5,50 @@ import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import LoadingSpinner from "./LoadingSpinner";
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
+	const { data:authUser } = useQuery({ queryKey: ["authUser"] });
+	const queryClient = useQueryClient();
+	const { mutate:deletePost, isPending } = useMutation({
+		mutationFn: async () => {
+			const res = await fetch(`/api/posts/${post._id}`, {
+				method: "DELETE"
+			});
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.error || "Delete post failed.");
+			}
+
+			return data;
+		},
+		onSuccess: () => {
+			toast.success("Post was deleted successfully.");
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+		}
+	});
+
 	const postOwner = post.user;
 	const isLiked = false;
-
-	const isMyPost = true;
-
+	const isMyPost = authUser._id === post.user._id;
 	const formattedDate = "1h";
-
 	const isCommenting = false;
 
-	const handleDeletePost = () => {};
+	const deletePostHandler = () => {
+		deletePost();
+	};
 
-	const handlePostComment = (e) => {
+	const commentOnPostHandler = (e) => {
 		e.preventDefault();
 	};
 
-	const handleLikePost = () => {};
+	const likeOrUnlikePostHandler = () => {
+
+	};
 
 	return (
 		<>
@@ -48,7 +73,9 @@ const Post = ({ post }) => {
 						
 						{isMyPost && (
 							<span className="flex justify-end flex-1">
-								<FaTrash className="cursor-pointer hover:text-red-500" onClick={handleDeletePost} />
+								{!isPending && <FaTrash className="cursor-pointer hover:text-red-500" onClick={deletePostHandler} />}
+
+								{isPending && <LoadingSpinner size="sm" />}
 							</span>
 						)}
 					</div>
@@ -114,7 +141,7 @@ const Post = ({ post }) => {
 
 									<form
 										className="flex gap-2 items-center mt-4 border-t border-gray-600 pt-2"
-										onSubmit={handlePostComment}
+										onSubmit={commentOnPostHandler}
 									>
 										<textarea
 											className="textarea w-full p-1 rounded text-md resize-none border focus:outline-none  border-gray-800"
@@ -143,7 +170,7 @@ const Post = ({ post }) => {
 								<span className="text-sm text-slate-500 group-hover:text-green-500">0</span>
 							</div>
 
-							<div className="flex gap-1 items-center group cursor-pointer" onClick={handleLikePost}>
+							<div className="flex gap-1 items-center group cursor-pointer" onClick={likeOrUnlikePostHandler}>
 								{!isLiked && (
 									<FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
 								)}
