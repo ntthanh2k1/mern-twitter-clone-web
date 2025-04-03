@@ -31,8 +31,8 @@ const SignInPage = () => {
     },
     onSuccess: () => {
       // refresh the authUser
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
       toast.success("Signed in successfully.");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     }
   });
 
