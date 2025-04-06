@@ -13,7 +13,7 @@ const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
 	const { data:authUser } = useQuery({ queryKey: ["authUser"] });
 	const queryClient = useQueryClient();
-	const { mutate:deletePost, isPending } = useMutation({
+	const { mutate:deletePost, isPending:isDeleting } = useMutation({
 		mutationFn: async () => {
 			const res = await fetch(`/api/posts/${post._id}`, {
 				method: "DELETE"
@@ -31,9 +31,38 @@ const Post = ({ post }) => {
 			queryClient.invalidateQueries({ queryKey: ["posts"] });
 		}
 	});
+	const { mutate:likePost, isPending:isLiking } = useMutation({
+		mutationFn: async () => {
+			const res = await fetch(`api/posts/like/${post._id}`, {
+				method: "POST"
+			});
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.error || "Like post failed.");
+			}
+
+			return data;
+		},
+		onSuccess: (updatedLikes) => {
+			toast.success("Like post successfully!");
+			queryClient.setQueryData(["posts"], (oldData) => {
+				return oldData.map((p) => {
+					if (p._id === post._id) {
+						return { ...p, likes: updatedLikes };
+					}
+
+					return p;
+				});
+			});
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		}
+	});
 
 	const postOwner = post.user;
-	const isLiked = false;
+	const isLiked = post.likes.includes(authUser._id);
 	const isMyPost = authUser._id === post.user._id;
 	const formattedDate = "1h";
 	const isCommenting = false;
@@ -47,7 +76,10 @@ const Post = ({ post }) => {
 	};
 
 	const likeOrUnlikePostHandler = () => {
-
+		if (isLiking) {
+			return;
+		}
+		likePost();
 	};
 
 	return (
@@ -73,9 +105,9 @@ const Post = ({ post }) => {
 						
 						{isMyPost && (
 							<span className="flex justify-end flex-1">
-								{!isPending && <FaTrash className="cursor-pointer hover:text-red-500" onClick={deletePostHandler} />}
+								{!isDeleting && <FaTrash className="cursor-pointer hover:text-red-500" onClick={deletePostHandler} />}
 
-								{isPending && <LoadingSpinner size="sm" />}
+								{isDeleting && <LoadingSpinner size="sm" />}
 							</span>
 						)}
 					</div>
@@ -171,11 +203,12 @@ const Post = ({ post }) => {
 							</div>
 
 							<div className="flex gap-1 items-center group cursor-pointer" onClick={likeOrUnlikePostHandler}>
-								{!isLiked && (
+								{isLiking && <LoadingSpinner size="sm" />}
+								{!isLiked && !isLiking && (
 									<FaRegHeart className="w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500" />
 								)}
 
-								{isLiked && <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />}
+								{isLiked && !isLiking && <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />}
 
 								<span
 									className={`text-sm group-hover:text-pink-500 ${
