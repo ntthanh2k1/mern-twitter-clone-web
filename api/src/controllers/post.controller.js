@@ -156,6 +156,7 @@ export const likeOrUnlikePost = async (req, res) => {
     const postId = req.params.id;
     // const { id: postId } = req.params;
 
+    const user = await User.findById(userId);
     const post = await Post.findById(postId);
 
     // Check post exists
@@ -170,17 +171,22 @@ export const likeOrUnlikePost = async (req, res) => {
     if (userLikedPost) {
       post.likes.pull(userId);
       await post.save();
-      await User.findByIdAndUpdate(userId, { $pull: { likedPost: postId } });
+      user.likedPost.pull(postId);
+      await user.save();
       // await Post.findByIdAndUpdate(postId, { $pull: { likes: userId } });
-      // await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
-      res.status(200).json({ message: "Unliked post successfully." });
+      // await User.findByIdAndUpdate(userId, { $pull: { likedPost: postId } });
+      
+      const updatedLikes = post.likes.filter(id => id.toString() !== userId.toString());
+
+      res.status(200).json(updatedLikes);
     }
     else {
       post.likes.push(userId);
       await post.save();
-      await User.findByIdAndUpdate(userId, { $push: { likedPost: postId } });
+      user.likedPost.push(postId);
+      await user.save();
       // await Post.findByIdAndUpdate(postId, { $push: { likes: userId } });
-      // await Post.updateOne({ _id: postId }, { $push: { likes: userId } });
+      // await User.findByIdAndUpdate(userId, { $push: { likedPost: postId } });
 
       const newNotification = new Notification({
         from: userId,
@@ -189,7 +195,10 @@ export const likeOrUnlikePost = async (req, res) => {
       });
 
       await newNotification.save();
-      res.status(200).json({ message: "Liked post successfully." });
+
+      const updatedLikes = post.likes;
+
+      res.status(200).json(updatedLikes);
     }
   } catch (error) {
     console.log(`Error likeOrUnlikePost module: ${error.message}`);

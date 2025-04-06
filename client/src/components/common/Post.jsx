@@ -178,8 +178,8 @@ const Post = ({ post }) => {
 								{isLiked && <FaRegHeart className="w-4 h-4 cursor-pointer text-pink-500 " />}
 
 								<span
-									className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-										isLiked ? "text-pink-500" : ""
+									className={`text-sm group-hover:text-pink-500 ${
+										isLiked ? "text-pink-500" : "text-slate-500"
 									}`}>
 									{post.likes.length}
 								</span>
