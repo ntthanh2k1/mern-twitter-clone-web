@@ -232,7 +232,7 @@ export const commentOnPost = async (req, res) => {
 
     post.comments.push(comment);
     await post.save();
-    res.status(201).json(post);
+    res.status(201).json(post.comments);
   } catch (error) {
     console.log(`Error commentOnPost module: ${error.message}`);
     res.status(500).json({ error: error.message });
