@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
@@ -11,6 +11,8 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
+import { formatMemberSinceDate } from "../../utils/date";
 
 const ProfilePage = () => {
 	const [coverImg, setCoverImg] = useState(null);
@@ -20,22 +22,27 @@ const ProfilePage = () => {
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const isLoading = false;
-	const isMyProfile = true;
+	const { username } = useParams();
+	
+	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+	const { data: user, isLoading, isRefetching, refetch } = useQuery({
+		queryKey: ["userProfile"],
+		queryFn: async () => {
+			const res = await fetch(`/api/users/profile/${username}`);
+			const data = await res.json();
 
-	const user = {
-		_id: "1",
-		fullName: "John Doe",
-		username: "johndoe",
-		profileImg: "/avatars/boy2.png",
-		coverImg: "/cover.png",
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
-		following: ["1", "2", "3"],
-		followers: ["1", "2", "3"],
-	};
+			if (!res.ok) {
+				throw new Error(data.error || "Error fetching user info.");
+			}
 
-	const handleImgChange = (e, state) => {
+			return data;
+		}
+	});
+
+	const isMyProfile = authUser._id === user?._id;
+	const memberSinceDate = formatMemberSinceDate(user?.createdAt);
+
+	const changeImgHandler = (e, state) => {
 		const file = e.target.files[0];
 		if (file) {
 			const reader = new FileReader();
@@ -47,14 +54,18 @@ const ProfilePage = () => {
 		}
 	};
 
+	useEffect(() => {
+		refetch()
+	}, [username, refetch]);
+
 	return (
 		<>
 			<div className="flex-[4_4_0]  border-x border-gray-700 min-h-screen ">
 				{/* HEADER */}
-				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className="text-center text-lg mt-4">User not found</p>}
+				{isLoading && isRefetching && <ProfileHeaderSkeleton />}
+				{!isLoading && !isRefetching && !user && <p className="text-center text-lg mt-4">User not found</p>}
 				<div className="flex flex-col">
-					{!isLoading && user && (
+					{!isLoading && !isRefetching && user && (
 						<>
 							<div className="flex gap-10 px-4 py-2 items-center">
 								<Link to="/">
@@ -86,14 +97,14 @@ const ProfilePage = () => {
 									hidden
                   accept="image/*"
 									ref={coverImgRef}
-									onChange={(e) => handleImgChange(e, "coverImg")}
+									onChange={(e) => changeImgHandler(e, "coverImg")}
 								/>
 								<input
 									type="file"
 									hidden
                   accept="image/*"
 									ref={profileImgRef}
-									onChange={(e) => handleImgChange(e, "profileImg")}
+									onChange={(e) => changeImgHandler(e, "profileImg")}
 								/>
 								{/* USER AVATAR */}
 								<div className="avatar absolute -bottom-16 left-4">
@@ -155,7 +166,7 @@ const ProfilePage = () => {
 									)}
 									<div className="flex gap-2 items-center">
 										<IoCalendarOutline className="w-4 h-4 text-slate-500" />
-										<span className="text-sm text-slate-500">Joined July 2021</span>
+										<span className="text-sm text-slate-500">{memberSinceDate}</span>
 									</div>
 								</div>
 								<div className="flex gap-2">
@@ -192,7 +203,7 @@ const ProfilePage = () => {
 						</>
 					)}
 
-					<Posts />
+					<Posts feedType={feedType} username={username} userId={user?._id} />
 				</div>
 			</div>
 		</>
