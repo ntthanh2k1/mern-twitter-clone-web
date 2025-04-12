@@ -11,8 +11,10 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatMemberSinceDate } from "../../utils/date";
+import useFollow from "../../hooks/useFollow";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const ProfilePage = () => {
 	const [coverImg, setCoverImg] = useState(null);
@@ -24,7 +26,10 @@ const ProfilePage = () => {
 
 	const { username } = useParams();
 	
-	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+	const queryClient = useQueryClient();
+	// const { data:authUser } = useQuery({ queryKey: ["authUser"] });
+  const authUser = queryClient.getQueryData(["authUser"]);
+	
 	const { data: user, isLoading, isRefetching, refetch } = useQuery({
 		queryKey: ["userProfile"],
 		queryFn: async () => {
@@ -39,8 +44,11 @@ const ProfilePage = () => {
 		}
 	});
 
+	const { follow, isPending: isFollowing } = useFollow();
+
 	const isMyProfile = authUser._id === user?._id;
 	const memberSinceDate = formatMemberSinceDate(user?.createdAt);
+	const isFollowed = authUser.following.includes(user?._id);
 
 	const changeImgHandler = (e, state) => {
 		const file = e.target.files[0];
@@ -126,9 +134,13 @@ const ProfilePage = () => {
 								{!isMyProfile && (
 									<button
 										className="btn btn-outline rounded-full btn-sm"
-										onClick={() => alert("Followed successfully")}
+										onClick={() => {
+											follow(user?._id);
+										}}
 									>
-										Follow
+										{isFollowing && <LoadingSpinner size="sm" />}
+										{!isFollowing && isFollowed && "Unfollow"}
+										{!isFollowing && !isFollowed && "Follow"}
 									</button>
 								)}
 								{(coverImg || profileImg) && (

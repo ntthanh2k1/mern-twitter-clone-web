@@ -4,12 +4,13 @@ import { BiLogOut } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import XSvg from "../svgs/X";
 import { FaUser } from "react-icons/fa";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 const Sidebar = () => {
   const queryClient = useQueryClient();
-  const { data:authUser } = useQuery({ queryKey: ["authUser"] });
+  // const { data:authUser } = useQuery({ queryKey: ["authUser"] });
+  const authUser = queryClient.getQueryData(["authUser"]);
 
   const { mutate:signOutMutation } = useMutation({
     mutationFn: async () => {
