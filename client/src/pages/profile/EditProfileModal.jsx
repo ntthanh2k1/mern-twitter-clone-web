@@ -1,14 +1,48 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ authUser }) => {
 	const [formData, setFormData] = useState({
-		fullName: "",
-		username: "",
-		email: "",
-		bio: "",
-		link: "",
+		fullName: authUser.fullName,
+		username: authUser.username,
+		email: authUser.email,
+		bio: authUser.bio,
+		link: authUser.link,
 		newPassword: "",
 		currentPassword: "",
+	});
+
+	const queryClient = useQueryClient();
+
+	const { mutate: updateProfile, isPending: isUpdatingProfile} = useMutation({
+		mutationFn: async () => {
+			const res = await fetch("/api/users/update", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(formData)
+			});
+			const data = await res.json();
+
+			if (!res.ok) {
+				throw new Error(data.error || "Update profile failed.");
+			}
+
+			return data;
+		},
+		onSuccess: () => {
+			toast.success("Update profile successfully.");
+			Promise.all([
+				queryClient.invalidateQueries({ queryKey: ["authUser"] }),
+				queryClient.invalidateQueries({ queryKey: ["userProfile"] })
+			]);
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		}
 	});
 
 	const handleInputChange = (e) => {
@@ -30,7 +64,7 @@ const EditProfileModal = () => {
 						className="flex flex-col gap-4"
 						onSubmit={(e) => {
 							e.preventDefault();
-							alert("Profile updated successfully");
+							updateProfile(formData);
 						}}
 					>
 						<div className="flex flex-wrap gap-2">
@@ -49,6 +83,7 @@ const EditProfileModal = () => {
 								value={formData.username}
 								name="username"
 								onChange={handleInputChange}
+								readOnly
 							/>
 						</div>
 						<div className="flex flex-wrap gap-2">
@@ -59,6 +94,7 @@ const EditProfileModal = () => {
 								value={formData.email}
 								name="email"
 								onChange={handleInputChange}
+								readOnly
 							/>
 							<textarea
 								placeholder="Bio"
@@ -94,7 +130,9 @@ const EditProfileModal = () => {
 							name="link"
 							onChange={handleInputChange}
 						/>
-						<button className="btn btn-primary rounded-full btn-sm text-white">Update</button>
+						<button className="btn btn-primary rounded-full btn-sm text-white">
+							{isUpdatingProfile ? <LoadingSpinner size="md" /> : "Update"}
+						</button>
 					</form>
 				</div>
 				<form method="dialog" className="modal-backdrop">

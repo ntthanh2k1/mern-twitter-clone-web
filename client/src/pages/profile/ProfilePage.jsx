@@ -59,6 +59,8 @@ const ProfilePage = () => {
 			if (!res.ok) {
 				throw new Error(data.error || "Update profile failed.");
 			}
+
+			return data;
 		},
 		onSuccess: () => {
 			toast.success("Update profile successfully.");
@@ -158,7 +160,7 @@ const ProfilePage = () => {
 								</div>
 							</div>
 							<div className="flex justify-end px-4 mt-5">
-								{isMyProfile && <EditProfileModal />}
+								{isMyProfile && <EditProfileModal authUser={authUser} />}
 								{!isMyProfile && (
 									<button
 										className="btn btn-outline rounded-full btn-sm"

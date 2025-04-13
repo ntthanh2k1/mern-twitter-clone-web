@@ -120,23 +120,23 @@ export const updateUser = async (req, res) => {
     // check username exists
     const existingUser = await User.findOne({ username });
 
-    if (existingUser) {
-      return res.status(400).json({ error: "Username is already taken." });
-    }
+    // if (existingUser) {
+    //   return res.status(400).json({ error: "Username is already taken." });
+    // }
 
     // check email's format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (email && !emailRegex.test(email)) {
-      return res.status(400).json({ error: "Email's format is invalid." });
-    }
+    // if (email && !emailRegex.test(email)) {
+    //   return res.status(400).json({ error: "Email's format is invalid." });
+    // }
 
-    // check email exists
-    const existingEmail = await User.findOne({ email });
+    // // check email exists
+    // const existingEmail = await User.findOne({ email });
 
-    if (existingEmail) {
-      return res.status(400).json({ error: "Email is already taken." });
-    }
+    // if (existingEmail) {
+    //   return res.status(400).json({ error: "Email is already taken." });
+    // }
 
     // Check current password and new password
     if ((!currentPassword && newPassword) || (currentPassword && !newPassword)) {
@@ -181,8 +181,8 @@ export const updateUser = async (req, res) => {
 
     // update rest
     user.fullName = fullName || user.fullName;
-    user.username = username || user.username;
-    user.email = email || user.email;
+    // user.username = username || user.username;
+    // user.email = email || user.email;
     user.profileImg = profileImg || user.profileImg;
     user.coverImg = coverImg || user.coverImg;
     user.bio = bio || user.bio;
